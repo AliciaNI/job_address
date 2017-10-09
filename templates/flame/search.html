@@ -1,0 +1,26 @@
+{% extends 'flame/base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'flame/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/bootstrap-responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/ie10-viewport-bug-workaround.css' %}">
+{% endblock %}
+
+{% block menu %}
+    {% include 'flame/menu.html' %}
+{% endblock %}
+
+{% block main %}
+    <form method="get" action="{% url 'flame:show' %}" class="form-search" target="_blank">
+        <select name="searchurl">
+            {% for url in searchtypelist %}
+                <option value="{{ url.nick }}"{% if url.nick == searchtype %} selected="selected" {% endif %}>{{ url.urlname }}</option>
+            {% endfor %}
+        </select>
+        <input style="height: 30px;width: 200px;" type="text" name="searchjob" placeholder="职位"  class="input-medium search-query" value="{{ searchname }}">
+{#        <a href="{% url 'flame:show' %}" target="view_window"><button type="submit" class="btn">Search</button></a>#}
+        <div id="z"><input type="submit" value="search"></div>
+    </form>
+{% endblock %}

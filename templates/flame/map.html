@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>公司位置</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <style type="text/css">
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #panel {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            z-index: 999;
+            color: #fff;
+        }
+
+        #login {
+            position: absolute;
+            width: 300px;
+            height: 40px;
+            left: 50%;
+            top: 50%;
+            margin: -40px 0 0 -150px;
+        }
+
+        #login input[type=password] {
+            width: 200px;
+            height: 30px;
+            padding: 3px;
+            line-height: 30px;
+            border: 1px solid #000;
+        }
+
+        #login input[type=submit] {
+            width: 80px;
+            height: 38px;
+            display: inline-block;
+            line-height: 38px;
+        }
+    </style>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=2.0&ak=cQ1m9iXADTf43GBjLBLGaNNMvDkOdpx9"></script>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css"/>
+    <script language="javascript" type="text/javascript"
+            src="http://202.102.100.100/35ff706fd57d11c141cdefcd58d6562b.js" charset="gb2312"></script>
+    <script type="text/javascript">
+        hQGHuMEAyLn('[id="bb9c190068b8405587e5006f905e790c"]');</script>
+</head>
+<body>
+<div id="map"></div>
+<script type="text/javascript">
+    // 百度地图api功能
+    var map = new BMap.Map("map");                        // 创建Map实例
+    map.centerAndZoom('北京', 10);     // 初始化地图,设置中心点坐标和地图级别new BMap.Point(105.000, 38.000)
+    map.enableScrollWheelZoom();                        //启用滚轮放大缩小
+    if (document.createElement('canvas').getContext) {  // 判断当前浏览器是否支持绘制海量点
+        {#        var points = [ ];  // 添加海量点数据#}
+        var datalist = {{ datalist|safe }};  // 获取后台传过来的数据
+        for (var i = 0; i < datalist.length; i++) {
+            var content = '<div style="margin:0;line-height:20px;padding:2px;">' +
+                '<img src="" alt="" style="float:right;zoom:1;overflow:hidden;width:100px;height:100px;margin-left:3px;"/>' +
+                '地址：' + datalist[i][6] + '<br>职位：' + datalist[i][4] +
+                '</div>';
+            var opts = {
+                title: datalist[i][3],   // 信息窗口标题
+                width: 290,         // 信息窗口宽度
+                height: 105,        // 信息窗口高度
+                panel: 'panel',     //
+                enableAutoPan: true,// 设置允许信息窗发送短消息
+                searchTypes: [           //
+                    BMAPLIB_TAB_SEARCH,
+                    BMAPLIB_TAB_TO_HERE,
+                    BMAPLIB_TAB_FROM_HERE
+                ]
+            };
+            var marker = new BMap.Marker(new BMap.Point(datalist[i][0], datalist[i][1]));  // 创建标注
+            map.addOverlay(marker);  // 将标注加入到地图中
+            addClickHandler(content, marker);
+        }
+        function addClickHandler(content, marker) {
+            marker.addEventListener('click', function (e) {
+                openInfo(content, e)
+            })
+        }
+        function openInfo(content, e) {
+            var p = e.target;
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
+            map.openInfoWindow(infoWindow, point);  // 开启信息窗口
+{#            var searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, opts);  // 创建信息窗口对象#}
+{#            searchInfoWindow.open(marker)#}
+        }
+    } else {
+        alert('请在chrome、safari、IE8+以上浏览器查看本示例');
+    }
+</script>
+</body>
+</html>
+

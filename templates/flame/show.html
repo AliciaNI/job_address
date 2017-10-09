@@ -1,0 +1,98 @@
+{% extends 'flame/base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'flame/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/ie10-viewport-bug-workaround.css' %}">
+    <link rel="stylesheet" href="{% static 'flame/css/show.css' %}">
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'flame/js/show.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+    <a href="/flame/map?tablename={{ tablename }}" target="_blank"><input type="button" value="地图显示" style="margin-bottom: 20px"></a>
+    <input type="button" id="everynums" value="{{ everynums }}" style="display: none">
+    {#  主题内容  #}
+    <table class="table table-bordered table_striped tabel-hover">
+        <tr>
+            <th>公司</th>
+            <th>职位</th>
+            <th>薪资</th>
+            <th>职位描述</th>
+            <th>公司描述</th>
+            <th>地址</th>
+        </tr>
+        {% for data in datalist %}
+            <tr style="display: none;">
+                <td>{{ data.company }}
+                    <ul>
+                        <li>{{ data.company }}</li>
+                    </ul>
+                </td>
+                <td>{{ data.job }}
+                    <ul>
+                        <li>{{ data.job }}</li>
+                    </ul>
+                </td>
+                <td>{{ data.salary }}</td>
+                <td>{{ data.job_infor }}
+                    <ul>
+                        <li>{{ data.job_infor }}</li>
+                    </ul>
+                </td>
+                <td>{{ data.company_infor }}
+                    <ul>
+                        <li>{{ data.company_infor }}</li>
+                    </ul>
+                </td>
+                <td>
+                    <a href="/flame/map/?lng={{ data.lng }}&lat={{ data.lat }}&zonecode={{ data.zone_code }}&address={{ data.address }}&company={{ data.company }}" target="_blank">{{ data.address }}</a>
+                    <ul>
+                        <li>{{ data.address }}</li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {#    分页#}
+    <nav aria-label="Page navigation" class="text-center">
+        <ul class="pagination">
+            <!--上一页-->
+            {% if stus.has_previous %}
+                <li>
+                    <a href="?pn={{ stus.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            <!--end-->
+{#        分页数字#}
+
+            <!--下一页-->
+            {% if stus.has_next %}
+                <li>
+                    <a href="?pn={{ stus.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="disabled">
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            <!--end-->
+        </ul>
+    </nav>
+{% endblock %}
+

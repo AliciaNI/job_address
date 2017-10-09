@@ -1,0 +1,34 @@
+table td {
+    max-width: 200px;
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+table tr:hover {
+    /*white-space: normal;*/
+    /*overflow: auto;*/
+    color: red;
+}
+
+table td:hover ul li{
+    padding: 10px 20px;
+    color: black;
+    display: block;
+    /*max-width: 200px;*/
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: hidden;
+}
+
+table tr td ul li{
+    display: none;
+    border: 1px solid #999;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    background: #fff;
+}
