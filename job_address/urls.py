@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from flame.views import login
 
 urlpatterns = [
+    url(r'^$', login, name='login'),
     url(r'^admin/', admin.site.urls),
     url(r'^flame/', include('flame.urls', namespace='flame')),
+    url(r'^statistic/', include('statistic.urls', namespace='statistic')),
 ]

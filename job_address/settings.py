@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'hh$%s1x^rq$r_0qop#)094jxkw5s7(er0%at9aw#ylny=qag*9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'flame.apps.FlameConfig'
+    'flame.apps.FlameConfig',
+    'statistic.apps.StatisticConfig',
 ]
 
 MIDDLEWARE = [
@@ -80,9 +81,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME':'find_chance',
         'USER':'root',
-        'PASSWORD': '111111',
-        'HOST': '10.0.123.247'
-        # 'HOST': 'localhost'
+        'PASSWORD': '123456',
+        # 'HOST': '10.0.123.247'
+        'HOST': 'localhost'
     }
 }
 

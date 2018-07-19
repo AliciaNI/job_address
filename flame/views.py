@@ -6,6 +6,8 @@ import threading
 import queue
 import urllib
 import urllib.request
+import time
+import traceback
 
 # 登录退出
 from django.contrib import auth
@@ -50,7 +52,9 @@ def createtable(tablename):
                 zone_code INT(10),
                 address VARCHAR(200) NOT NULL,
                 lng DECIMAL(20, 15) NOT NULL,
-                lat DECIMAL(20, 15) NOT NULL
+                lat DECIMAL(20, 15) NOT NULL,
+                salary_range INT,
+                release_time DATE
                 )
             """
         cursor.execute(sql)
@@ -87,7 +91,8 @@ def login(request):
 # 登出
 def logout(request):
     auth.logout(request)
-    return HttpResponseRedirect(request, 'flame/login.html')
+    # return HttpResponseRedirect(request, 'flame/login.html')
+    return HttpResponseRedirect('/flame/login')
 
 
 # 注册
@@ -163,13 +168,15 @@ def search(request):
 @login_required
 def show(request):
     # if request.method == 'POST':
-    everynums = request.COOKIES.get('everynums', 19)
+    everynums = request.COOKIES.get('everynums', 9)
     # 获取搜索内容和搜索的网址类型
     # jobname = request.POST.get('searchjob', None)
     # searchtype = request.POST.get('searchurl', None)
     # if jobname is None:
-    jobname = request.GET.get('searchjob', None)
-    searchtype = request.GET.get('searchurl', None)
+    jobname = request.GET.get('searchjob', '')
+    searchtype = request.GET.get('searchurl', '')
+    urltype_ins = models.urltype.objects.get(nick=searchtype)
+    models.position_website.objects.get_or_create(position=jobname, website_id=urltype_ins.id)
 
     jobname = jobname.replace(' ', '_')
     print('job and type', jobname, searchtype)
@@ -198,10 +205,10 @@ def show(request):
             adict['salary'] = data[2]
             adict['job_infor'] = data[4]
             adict['company_infor'] = data[5]
-            adict['address'] = data[-3]
-            adict['lng'] = data[-2]
-            adict['lat'] = data[-1]
-            adict['zone_code'] = data[-4]
+            adict['address'] = data[-5]
+            adict['lng'] = data[-4]
+            adict['lat'] = data[-3]
+            adict['zone_code'] = data[-6]
             datalist.append(adict)
 
         # return render(request, 'flame/show.html', {'searchjob': jobname, 'searchurl': searchtype, "datalist": datalist, 'refreshflags':False})
@@ -216,14 +223,14 @@ def show(request):
 
         # 保存到数据库表, 多线程去保存
         for i in range(5):
-            thd = threading.Thread(target=toTable, args=(tablename, dataqueue))
+            thd = threading.Thread(target=toTable, args=(tablename, dataqueue, jobname, urltype_ins.id))
             thd.start()
         # return render(request, 'flame/show.html', {'searchjob': jobname, 'searchurl': searchtype, 'refreshflags':True})
-        return render(request, 'flame/show.html', {'everynums': everynums})
+        return render(request, 'flame/show.html', {'tablename': tablename, 'everynums': everynums})
 
 
 # 把数据插入数据库
-def toTable(tablename, dataqueue):
+def toTable(tablename, dataqueue, jobname, urltype_id):
     cursor = connection.cursor()
     delete_sql = 'delete from ' + tablename
     cursor.execute(delete_sql)
@@ -232,13 +239,18 @@ def toTable(tablename, dataqueue):
             data = dataqueue.get(timeout=50)
             infor_list = handledata(data)
             try:
-                insert_sql = """INSERT INTO """ + tablename + """(company, salary, job, job_information, company_information, company_zone, zone_code, address, lng, lat) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f')""" % (
+                insert_sql = """INSERT INTO """ + tablename + """(company, salary, job, job_information, 
+                company_information, company_zone, zone_code, address, lng, lat, release_time, salary_range) 
+                VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%s', '%d')""" % (
                     infor_list[0], infor_list[1], infor_list[2], infor_list[3], infor_list[4], infor_list[5],
-                    infor_list[6],
-                    infor_list[7], infor_list[8], infor_list[9])
+                    infor_list[6], infor_list[7], infor_list[8], infor_list[9], infor_list[10], infor_list[11])
                 cursor.execute(insert_sql)
-                # [company, salary, job, job_informations, company_informations, company_zone, zonecode, address, lng, lat]
-
+                # [company, salary, job, job_informations, company_informations, company_zone, zonecode, address, lng, lat, release_time, salary_range]
+                # 更新flame_positon_website中count数量
+                cursor.execute('select id from flame_position_website where position="%s" and website_id="%d"' %(jobname, urltype_id))
+                a = cursor.fetchone()
+                cursor.execute('update flame_position_website set count=count+1 where id="%d"' % a[0])
+                connection.commit()
                 infor_dict = {
                     'company': infor_list[0],
                     'job': infor_list[2],
@@ -251,9 +263,10 @@ def toTable(tablename, dataqueue):
                 }
                 to_url_queue.put(infor_dict)
             except Exception as e:
-                print(str(e))
+                print('insert_sql', insert_sql)
+                print(traceback.format_exc())
         except Exception as e:
-            print(str(e))
+            print(traceback.format_exc())
 
 
 # 处理返回的数据，处理成数据库中个字段类型
@@ -263,15 +276,41 @@ def handledata(data):
         salary = data[3][0]  # 薪水
     except:
         salary = ''
+    # salary_range：1、0-6；2、6-10；3、10-15；4、15-20；5、20-25；6、25-30；7、30- （千）
+    salary_range = -1
+    if salary != '' and salary.endswith('月'):
+        salary_true = salary[:-3].split('-')
+        salary_start = float(salary_true[0])
+        salary_end = float(salary_true[1])
+        salary_jizhun = 1
+        if salary.endswith('万/月'):
+            salary_jizhun = 10
+        elif salary.endswith('千/月'):
+            pass
+
+        if salary_end < 6/salary_jizhun or salary_start < 6/salary_jizhun:
+            salary_range = 1
+        if salary_start >= 6/salary_jizhun:# and salary_end < 10/salary_jizhun:
+            salary_range = 2
+        if salary_start >= 10/salary_jizhun:# and salary_end < 15/salary_jizhun:
+            salary_range = 3
+        if salary_start >= 15/salary_jizhun:# and salary_end < 20/salary_jizhun:
+            salary_range = 4
+        if salary_start >= 20/salary_jizhun:# and salary_end < 25/salary_jizhun:
+            salary_range = 5
+        if salary_start >= 25/salary_jizhun:# and salary_end < 30/salary_jizhun:
+            salary_range = 6
+        if salary_start >= 30/salary_jizhun:
+            salary_range = 7
     job = data[0][0]  # 职位
     jobinformations = ''  # 职位信息
     for infor in data[5]:
         jobinformations += infor
-    job_informations = jobinformations.strip()
+    job_informations = jobinformations.strip().replace("'", '"')
     companyinformations = ''  # 公司信息
     for infor in data[6]:
         companyinformations += infor
-    company_informations = companyinformations.strip()
+    company_informations = companyinformations.strip().replace("'", '"')
     company_zone = data[2][0]
     zonecode = 0  # 非北京地区的
     if company_zone.find('延庆') != -1:
@@ -319,8 +358,9 @@ def handledata(data):
     rez = json.loads(res)
     lng = rez['result']['location']['lng']  # 经度
     lat = rez['result']['location']['lat']  # 纬度
+    release_time = str(time.localtime().tm_year) + '.' + data[7]
     infor_list = [company, salary, job, job_informations, company_informations, company_zone, zonecode, address, lng,
-                  lat]
+                  lat, release_time, salary_range]
     # print(infor_list)
     return infor_list
 
@@ -366,22 +406,25 @@ def map(request):
         zonecode = request.GET.get('zonecode')
         address = request.GET.get('address')
         company = request.GET.get('company')
-        data = [[lng, lat, zonecode, address, company]]
+        job = request.GET.get('job')
+        data = [[lng, lat, zonecode, company, job, 0, address]]
         data = json.dumps(data)
         return render(request, 'flame/map.html', {'datalist': data})
     else:
         xylist = []
         cursor = connection.cursor()
         select_sql = 'select * from ' + tablename
-        cursor.execute(select_sql)
+        print('select sql', select_sql)
+        row_count = cursor.execute(select_sql)
+        print('row count', row_count)
         databaselist = cursor.fetchall()
         for data in databaselist:
             company = data[1]
             job = data[3]
             salary = data[2]
-            address = data[-3]
-            lng = float(data[-2])
-            lat = float(data[-1])
-            zone_code = data[-4]
+            address = data[-5]
+            lng = float(data[-4])
+            lat = float(data[-3])
+            zone_code = data[-6]
             xylist.append([lng, lat, zone_code, company, job, salary, address])
         return render(request, 'flame/map.html', {'datalist': json.dumps(xylist)})

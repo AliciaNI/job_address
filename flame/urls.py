@@ -4,6 +4,7 @@ from . import views
 handler404 = 'views.page_not_found'
 
 urlpatterns = [
+    url(r'^$', views.login, name='defalut'),
     url(r'^show/$', views.show, name='show'),
     url(r'^login/$', views.login, name='login'),
     url(r'^register/$', views.register, name='register'),

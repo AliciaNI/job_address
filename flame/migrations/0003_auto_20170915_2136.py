@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flame', '0002_tab1_tab2'),
+        ('flame', '0001_initial'),
     ]
 
     operations = [
@@ -22,11 +22,5 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name_plural': '网址类型',
             },
-        ),
-        migrations.DeleteModel(
-            name='tab1',
-        ),
-        migrations.DeleteModel(
-            name='tab2',
         ),
     ]

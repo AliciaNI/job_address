@@ -69,9 +69,9 @@ class Merge_Url(threading.Thread):
             pass
 
 
-# '''
+'''
 q = queue.Queue()
 page=Merge_Url('python','51-job', q)
 page.start()
 
-# '''
+'''

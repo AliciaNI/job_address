@@ -51,11 +51,15 @@ class CrawlData:
             CompanyName = mytree.xpath("//*[@class='cname']/a/@title")  # 2：公司名称
             Salary = mytree.xpath("//*[@class='cn']/strong/text()")  # 3：薪资
             JobInformation = mytree.xpath("//*[@class='bmsg job_msg inbox']/text()")  # 4：职位信息
+            if ''.join(JobInformation).strip() == '':
+                JobInformation = mytree.xpath("//*[@class='bmsg job_msg inbox']/p/text()")  # 4：职位信息
             try:
-                WorkAddress = mytree.xpath("//*[@class='fp']/text()")[1] # 5：上班地址
+                WorkAddress = mytree.xpath("//*[@class='bmsg inbox']/p/text()")[1] # 5：上班地址
             except:
                 WorkAddress=[]
             CompanyInformation = mytree.xpath("//*[@class='tmsg inbox']/text()")  # 6：公司信息
+            Release_time = mytree.xpath("//*[@class='t1']/span[@class='sp4'][last()]/text()") # 8：发布日期
+            Release_time = Release_time[0][:-2]
             AllInformations.append(WorkName)
             AllInformations.append(CompanyName)
             AllInformations.append(CompanyZone)
@@ -63,11 +67,13 @@ class CrawlData:
             AllInformations.append(WorkAddress)
             AllInformations.append(JobInformation)
             AllInformations.append(CompanyInformation)
+            AllInformations.append(Release_time)
             # try:
             #     print(AllInformations)  # 输出编码错误
             # except:
             #     pass
             for data in AllInformations:
+                # print(data)
                 if len(data) == 0:
                     break
             else:
@@ -75,5 +81,8 @@ class CrawlData:
                 # print("所有信息获取完毕")
             # return  AllInformations
 
-# get = CrawlData('python','51-job')
-# get.CrawlInformations()
+# import queue
+# dataqueue = queue.Queue()
+# get = CrawlData('python','51-job', dataqueue)
+# # get.CrawlInformations()
+# get.getData('http://jobs.51job.com/beijing-cyq/99836378.html?s=01&t=0')
