@@ -9,10 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <script type="text/javascript" src="{% static 'flame/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'mainbase/js/jquery.min.js' %}"></script>
 
     <!-- Le styles -->
-    <link href="{% static 'flame/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'mainbase/css/bootstrap.css' %}" rel="stylesheet">
     <style type="text/css">
         body {
             padding-top: 40px;
@@ -48,7 +48,7 @@
         }
 
     </style>
-    <link href="{% static 'flame/css/bootstrap-responsive.css' %}" rel="stylesheet">
+    <link href="{% static 'mainbase/css/bootstrap-responsive.css' %}" rel="stylesheet">
 
 </head>
 
@@ -64,9 +64,9 @@
         <input type="password" class="input-block-level" placeholder="密码" name="password">
         <input type="password" class="input-block-level" placeholder="确认密码" name="re_password">
         <span style="color:red">{{ error }}</span><br>
-        <a href="{% url 'flame:register' %}">
-            <button class="btn btn-large btn-primary" type="submit">注册</button>
-        </a>
+{#        <a href="{% url 'flame:register' %}">#}
+        <button class="btn btn-large btn-primary" type="submit">注册</button>
+{#        </a>#}
     </form>
 
 </div>

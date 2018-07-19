@@ -78,7 +78,7 @@
                 '</div>';
             var opts = {
                 title: datalist[i][3],   // 信息窗口标题
-                width: 290,         // 信息窗口宽度
+                width: 300,         // 信息窗口宽度
                 height: 105,        // 信息窗口高度
                 panel: 'panel',     //
                 enableAutoPan: true,// 设置允许信息窗发送短消息
@@ -90,20 +90,20 @@
             };
             var marker = new BMap.Marker(new BMap.Point(datalist[i][0], datalist[i][1]));  // 创建标注
             map.addOverlay(marker);  // 将标注加入到地图中
-            addClickHandler(content, marker);
+            addClickHandler(content, marker, opts);
         }
-        function addClickHandler(content, marker) {
+        function addClickHandler(content, marker, opts) {
             marker.addEventListener('click', function (e) {
-                openInfo(content, e)
+                openInfo(content, opts, e)
             })
         }
-        function openInfo(content, e) {
+        function openInfo(content, opts, e) {
             var p = e.target;
-            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
-            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象
-            map.openInfoWindow(infoWindow, point);  // 开启信息窗口
-{#            var searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, opts);  // 创建信息窗口对象#}
-{#            searchInfoWindow.open(marker)#}
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat+0.005);
+{#            var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象#}
+{#            map.openInfoWindow(infoWindow, point);  // 开启信息窗口#}
+            var searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, opts);  // 创建信息窗口对象
+            searchInfoWindow.open(point)
         }
     } else {
         alert('请在chrome、safari、IE8+以上浏览器查看本示例');

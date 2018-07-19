@@ -1,0 +1,47 @@
+{% extends 'flame/base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'mainbase/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'mainbase/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'mainbase/css/ie10-viewport-bug-workaround.css' %}">
+{% endblock %}
+
+{% block menu %}
+    {% include 'flame/menu.html' %}
+{% endblock %}
+
+{% block main %}
+    <div style="height:100%;overflow:auto;overflow-x:hidden;">
+        <div><p>职位数量分析：</p></div>
+        <div>
+            {% if position_image_list.image_list_length > 0 %}
+                {% for foo in position_image_list.dirname %}
+                    <img src="{{ foo }}">
+                {% endfor %}
+            {% else %}
+                <p>暂无</p>
+            {% endif %}
+        </div>
+        <div><p>日期数量分析：</p></div>
+        <div>
+            {% if date_image_list.image_list_length > 0 %}
+                {% for foo in date_image_list.dirname %}
+                    <img src="{{ foo }}">
+                {% endfor %}
+            {% else %}
+                <p>暂无</p>
+            {% endif %}
+        </div>
+        <div><p>薪水数量分析：</p></div>
+        <div>
+            {% if salary_image_list.image_list_length > 0 %}
+                {% for foo in salary_image_list.dirname %}
+                    <img src="{{ foo }}">
+                {% endfor %}
+            {% else %}
+                <p>暂无</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
