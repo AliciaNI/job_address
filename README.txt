@@ -97,9 +97,4 @@ view.py 和 爬虫py 内容数据的传递 通过 队列。deque
     1、修改search.html页面，form的提交方式为get，这样刷新show.html时就不会提示是否重新提交表单了。
     2、{% csrf_token %} , 放开'django.middleware.csrf.CsrfViewMiddleware'时，在form表单中添加这句话。就可正常提交post请求了。
     
-2018 -3-24
-    1：修改了页面结构
-    2：数据爬取转变为爬取一条保存一条
-2018 -07-19
-    上传  然而并不知道为什么隔这么久才上传，修改的东西都忘记了 =_=
-    
+
