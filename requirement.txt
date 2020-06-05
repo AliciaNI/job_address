@@ -1,6 +1,6 @@
 certifi==2018.1.18
 chardet==3.0.4
-Django==1.11.9
+Django==1.11.29
 idna==2.6
 lxml==4.1.1
 mysqlclient==1.3.12
